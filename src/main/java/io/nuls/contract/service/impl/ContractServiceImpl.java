@@ -21,7 +21,8 @@ public class ContractServiceImpl implements ContractService {
     private final Logger logger = LoggerFactory.getLogger(ContractServiceImpl.class);
     @Resource
     private HttpClientService httpClientService;
-
+    @Resource
+    private HttpClientDownloadThread downloadThread;
     @Autowired
     private ContractInfoConfigurer infoConfigurer;
 
@@ -281,7 +282,9 @@ public class ContractServiceImpl implements ContractService {
     public Result export(String address,String targetPath){
         Result result = new Result();
         try{
-            Thread thread =new Thread(new HttpClientDownloadThread(address,targetPath));
+            downloadThread.setContractAddress(address);
+            downloadThread.setTargetPath(targetPath);
+            Thread thread =new Thread(downloadThread);
             thread.start();
             result=ResultGenerator.genSuccessResult("正在下载，请在路径:"+targetPath+"下面查看jar包");
         }catch (Exception e){
@@ -295,6 +298,12 @@ public class ContractServiceImpl implements ContractService {
     public Result addServiceNode(NodeInfo nodeInfo) {
         infoConfigurer.setIpAndPort(nodeInfo.getIpAndPort());
         return ResultGenerator.genSuccessResult("添加服务端节点信息成功");
+    }
+
+
+    @Override
+    public Result getServiceNode() {
+        return ResultGenerator.genSuccessResult(infoConfigurer.getIpAndPort());
     }
 
     @Override
@@ -311,6 +320,12 @@ public class ContractServiceImpl implements ContractService {
     public Result addAccountAddress(String address) {
         infoConfigurer.setAccount(address);
         return ResultGenerator.genSuccessResult("添加账户地址成功");
+    }
+
+
+    @Override
+    public Result getAccountAddress() {
+        return ResultGenerator.genSuccessResult(infoConfigurer.getAccount());
     }
 
     @Override

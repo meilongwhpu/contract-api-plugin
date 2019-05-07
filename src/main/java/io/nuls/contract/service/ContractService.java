@@ -19,6 +19,7 @@ public interface ContractService {
       String GET_CONTRACT_TX_INFO_PATH="/tx/";
       String GET_CONTRACT_TX_LIST_PATH="/tx/list/";
       String GET_WALLET_CONTRACT_ADDRESS_LIST_PATH="/wallet/list/";
+      String EXPORT="/export/";
 
     public Result createContract(ContractCreate create);
     public Result contractConstructor(ContractCode code);
@@ -37,8 +38,10 @@ public interface ContractService {
     public Result export(String address,String targetPath);
 
     public Result addServiceNode(NodeInfo nodeInfo);
+    public Result getServiceNode();
     public Result removeServiceNode(NodeInfo nodeInfo);
     public Result addAccountAddress(String address);
+    public Result getAccountAddress();
     public Result removeAccountAddress(String address);
 
 }

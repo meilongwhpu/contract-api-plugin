@@ -3,17 +3,15 @@ package io.nuls.contract.resource;
 import io.nuls.contract.httpclient.model.Result;
 import io.nuls.contract.httpclient.model.ResultCode;
 import io.nuls.contract.httpclient.model.ResultGenerator;
+import io.nuls.contract.kernel.utils.StringUtils;
 import io.nuls.contract.model.*;
 import io.nuls.contract.packages.PackageService;
 import io.nuls.contract.service.ContractService;
 import io.nuls.contract.utils.ToolUtils;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.*;
-import io.nuls.contract.kernel.utils.StringUtils;
+
 import javax.annotation.Resource;
-import javax.websocket.server.PathParam;
 
 /**
 * Created by CodeGenerator on 2019/04/17.
@@ -31,7 +29,7 @@ public class ContractController {
 
     @PostMapping("/package")
     @ApiOperation(value="智能合约打包",notes="智能合约打包")
-    public Result packageContract(@ApiParam(name="packageContractInfo", value="智能合约的源代码信息", required=true) PackageContractInfo packageContractInfo){
+    public Result packageContract(@ApiParam(name="packageContractInfo", value="智能合约的源代码信息", required=true) @RequestBody PackageContractInfo packageContractInfo){
         if(packageContractInfo==null){
             return ResultGenerator.genFailResult(ResultCode.PARAMETER_ERROR,"参数错误");
         }
@@ -58,7 +56,7 @@ public class ContractController {
 
     @PostMapping("/create")
     @ApiOperation(value="创建智能合约",notes="创建智能合约")
-    public Result createContract(@ApiParam(name = "createForm", value = "创建智能合约", required = true)ContractCreate create) {
+    public Result createContract(@ApiParam(name = "createForm", value = "创建智能合约", required = true) @RequestBody ContractCreate create) {
         if (create == null || create.getGasLimit() < 0 || create.getPrice() < 0) {
             return ResultGenerator.genFailResult(ResultCode.PARAMETER_ERROR,"参数GasLimit和price应该大于零");
         }
@@ -75,7 +73,7 @@ public class ContractController {
 
     @PostMapping("/constructor")
     @ApiOperation(value="获取智能合约构造函数",notes="获取智能合约构造函数")
-    public Result contractConstructor(@ApiParam(name = "createForm", value = "创建智能合约", required = true)  ContractCode code) {
+    public Result contractConstructor(@ApiParam(name = "createForm", value = "创建智能合约", required = true) @RequestBody  ContractCode code) {
         if (code == null) {
             return ResultGenerator.genFailResult(ResultCode.PARAMETER_ERROR,"参数不能为空");
         }
@@ -83,13 +81,13 @@ public class ContractController {
         if(StringUtils.isBlank(contractCode)) {
             return ResultGenerator.genFailResult(ResultCode.NULL_PARAMETER,"智能合约代码不能为空");
         }
-        return ResultGenerator.genSuccessResult();
+        return contractService.contractConstructor(code);
     }
 
 
     @PostMapping("/precreate")
     @ApiOperation(value="测试创建智能合约",notes="测试创建智能合约")
-    public Result preCreateContract(@ApiParam(name = "preCreateForm", value = "测试创建智能合约", required = true) PreContractCreate create) {
+    public Result preCreateContract(@ApiParam(name = "preCreateForm", value = "测试创建智能合约", required = true) @RequestBody PreContractCreate create) {
         if (create == null || create.getGasLimit() < 0 || create.getPrice() < 0) {
             return ResultGenerator.genFailResult(ResultCode.PARAMETER_ERROR,"参数GasLimit和price应该大于零");
         }
@@ -100,12 +98,12 @@ public class ContractController {
         if(StringUtils.isBlank(create.getSender())){
             return ResultGenerator.genFailResult(ResultCode.PARAMETER_ERROR,"参数sender不能为空");
         }
-        return ResultGenerator.genSuccessResult();
+        return contractService.preCreateContract(create);
     }
 
     @PostMapping("/imputedgas/create")
     @ApiOperation(value="估算创建智能合约的GAS消耗",notes="估算创建智能合约的GAS消耗")
-    public Result imputedGasCreateContract(@ApiParam(name="imputedGasCreateForm", value="估算创建智能合约的Gas消耗", required=true) ImputedGasContractCreate paramImputedGasContractCreate) {
+    public Result imputedGasCreateContract(@ApiParam(name="imputedGasCreateForm", value="估算创建智能合约的Gas消耗", required=true) @RequestBody ImputedGasContractCreate paramImputedGasContractCreate) {
         if (paramImputedGasContractCreate == null) {
             return ResultGenerator.genFailResult(ResultCode.PARAMETER_ERROR,"参数不能为空");
         }
@@ -124,7 +122,7 @@ public class ContractController {
 
     @PostMapping("/call")
     @ApiOperation(value="调用智能合约",notes="调用智能合约")
-    public Result callContract(@ApiParam(name="callFrom", value="调用智能合约", required=true) ContractCall paramContractCall){
+    public Result callContract(@ApiParam(name="callFrom", value="调用智能合约", required=true) @RequestBody ContractCall paramContractCall){
         if (paramContractCall == null || paramContractCall.getValue() < 0 || paramContractCall.getGasLimit() < 0 || paramContractCall.getPrice() < 0) {
             return ResultGenerator.genFailResult(ResultCode.PARAMETER_ERROR,"参数value或GasLimit或price错误");
         }
@@ -136,7 +134,7 @@ public class ContractController {
 
     @PostMapping("/imputedgas/call")
     @ApiOperation(value="估算调用智能合约的Gas消耗",notes="估算调用智能合约的Gas消耗")
-    public Result imputedGasCallContract(@ApiParam(name="imputedGasCallForm", value="估算调用智能合约的Gas消耗", required=true) ImputedGasContractCall paramImputedGasContractCall){
+    public Result imputedGasCallContract(@ApiParam(name="imputedGasCallForm", value="估算调用智能合约的Gas消耗", required=true) @RequestBody ImputedGasContractCall paramImputedGasContractCall){
         if (paramImputedGasContractCall == null || paramImputedGasContractCall.getSender()==null ||
                 paramImputedGasContractCall.getContractAddress()==null || paramImputedGasContractCall.getMethodName()==null
                 ||paramImputedGasContractCall.getPrice() < 0) {
@@ -148,7 +146,7 @@ public class ContractController {
 
     @PostMapping("/collection")
     @ApiOperation(value="收藏智能合约地址/修改备注名称",notes="收藏智能合约地址/修改备注名称")
-    public Result contractCollection(@ApiParam(name="collection", value="收藏智能合约地址/修改备注名称", required=true) ContractCollection paramContractCollection){
+    public Result contractCollection(@ApiParam(name="collection", value="收藏智能合约地址/修改备注名称", required=true) @RequestBody ContractCollection paramContractCollection){
         if (paramContractCollection == null) {
             return ResultGenerator.genFailResult(ResultCode.PARAMETER_ERROR,"参数不能为空");
         }
@@ -163,7 +161,7 @@ public class ContractController {
 
     @PostMapping("/collection/cancel")
     @ApiOperation(value="取消收藏智能合约地址",notes="取消收藏智能合约地址")
-    public Result collectionCancel(@ApiParam(name="collectionBase", value="取消收藏参数", required=true) ContractAddressBase paramContractAddressBase){
+    public Result collectionCancel(@ApiParam(name="collectionBase", value="取消收藏参数", required=true) @RequestBody ContractAddressBase paramContractAddressBase){
         if (paramContractAddressBase == null) {
             return ResultGenerator.genFailResult(ResultCode.PARAMETER_ERROR,"参数不能为空");
         }
@@ -178,7 +176,7 @@ public class ContractController {
 
     @PostMapping("/wallet/list/{address}")
     @ApiOperation(value="获取钱包账户的合约地址列表(账户创建的合约以及钱包收藏的合约)",notes="获取钱包账户的合约地址列表(账户创建的合约以及钱包收藏的合约)")
-    public Result getContractCollectionList(@ApiParam(name="address", value="钱包账户地址", required=true) @PathParam("address") String address,
+    public Result getContractCollectionList(@ApiParam(name="address", value="钱包账户地址", required=true) @RequestParam(value="address",required=true) String address,
                                             @ApiParam(name="pageNumber", value="页码", required=true) @RequestParam(value="pageNumber",required=true) Integer pageNumber,
                                             @ApiParam(name="pageSize", value="每页条数", required=false) @RequestParam(value="pageSize", required=false) Integer pageSize){
         if (null == pageNumber || pageNumber == 0) {
@@ -231,7 +229,7 @@ public class ContractController {
     public Result getTxList(@ApiParam(name="contractAddress", value="智能合约地址", required=true) @RequestParam("contractAddress") String contractAddress,
                             @ApiParam(name="pageNumber", value="页码", required=true) @RequestParam(value="pageNumber",required=true) Integer pageNumber,
                             @ApiParam(name="pageSize", value="每页条数", required=false) @RequestParam(value="pageSize", required=false) Integer pageSize,
-                            @ApiParam(name="accountAddress", value="钱包账户地址") @RequestParam(value="accountAddress") String accountAddress){
+                            @ApiParam(name="accountAddress", value="钱包账户地址") @RequestParam(value="accountAddress", required=false) String accountAddress){
         if (null == pageNumber || pageNumber == 0) {
             pageNumber = 1;
         }
@@ -249,7 +247,7 @@ public class ContractController {
 
     @GetMapping(value="/export/{address}")
     @ApiOperation(value="导出合约编译代码的jar包",notes="导出合约编译代码的jar包")
-    public Result export(@ApiParam(name = "address", value = "账户地址", required = true)
+    public Result export(@ApiParam(name = "address", value = "合约地址", required = true)
                                     @RequestParam("address") String address,
                          @ApiParam(name="targetPath", value="本地文件路径", required=true) @RequestParam(value="targetPath",required=true) String targetPath){
         if (StringUtils.isBlank(address)) {
@@ -263,7 +261,7 @@ public class ContractController {
 
     @PostMapping("/addServiceNode")
     @ApiOperation(value="添加服务器端的ip:port",notes="添加服务器端的ip:port")
-    public Result addServiceNode(@ApiParam(name="NodeInfo", value="服务端节点信息", required=true) NodeInfo nodeInfo){
+    public Result addServiceNode(@ApiParam(name="NodeInfo", value="服务端节点信息", required=true) @RequestBody NodeInfo nodeInfo){
        if(StringUtils.isBlank(nodeInfo.getIpAndPort())){
            return ResultGenerator.genFailResult(ResultCode.PARAMETER_ERROR,"服务端的节点地址不能为空");
        }
@@ -271,6 +269,12 @@ public class ContractController {
             return ResultGenerator.genFailResult(ResultCode.PARAMETER_ERROR,"服务端的节点的信息不合法");
         }
         return contractService.addServiceNode(nodeInfo);
+    }
+
+    @GetMapping(value="/getServiceNode")
+    @ApiOperation(value="获取服务端节点信息",notes="获取服务端节点信息")
+    public Result getServiceNode(){
+        return contractService.getServiceNode();
     }
 
     @PostMapping("/removeServiceNode")
@@ -293,6 +297,13 @@ public class ContractController {
         }
         return  contractService.addAccountAddress(address);
     }
+
+    @GetMapping(value="/getAccountAddress")
+    @ApiOperation(value="获取账户地址信息",notes="获取账户地址信息")
+    public Result getAccountAddress(){
+        return contractService.getAccountAddress();
+    }
+
 
     @PostMapping("/delAccount/{address}")
     @ApiOperation(value="删除账户地址",notes="删除账户地址")

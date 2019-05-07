@@ -48,7 +48,7 @@ public class ContractInfoConfigurer implements InitializingBean {
     public String[] getIpAndPort() {
         Object ipAndPort =propConfig.getProperty(ConfigurerConstant.SERVICEIPANDPORT);
         if(ipAndPort!=null &&!ipAndPort.toString().equals("")){
-            return   ipAndPort.toString().split("|");
+            return   ipAndPort.toString().split("\\|");
         }else{
             return new String[1];
         }
@@ -57,10 +57,10 @@ public class ContractInfoConfigurer implements InitializingBean {
     public void setIpAndPort(String ipAndPort) {
         Object oldValue =propConfig.getProperty(ConfigurerConstant.SERVICEIPANDPORT);
         if(oldValue!=null && !"".equals(oldValue)){
-            if(oldValue.toString().indexOf(ipAndPort)>0){
+            if(oldValue.toString().contains(ipAndPort)){
                 return;
             }
-            propConfig.setProperty(ConfigurerConstant.SERVICEIPANDPORT, oldValue.toString()+"|"+ipAndPort);
+            propConfig.setProperty(ConfigurerConstant.SERVICEIPANDPORT, oldValue.toString()+ConfigurerConstant.SEPARATOR+ipAndPort);
         }else {
             propConfig.setProperty(ConfigurerConstant.SERVICEIPANDPORT, ipAndPort);
         }
@@ -69,7 +69,7 @@ public class ContractInfoConfigurer implements InitializingBean {
     public String[] getAccount() {
         Object account =propConfig.getProperty(ConfigurerConstant.ACCOUNTADDRESS);
         if(account!=null &&!account.toString().equals("")){
-            return   account.toString().split("|");
+            return   account.toString().split("\\|");
         }else{
             return new String[1];
         }
@@ -78,10 +78,10 @@ public class ContractInfoConfigurer implements InitializingBean {
     public void setAccount(String account) {
         Object oldValue =propConfig.getProperty(ConfigurerConstant.ACCOUNTADDRESS);
         if(oldValue!=null && !"".equals(oldValue)){
-            if(oldValue.toString().indexOf(account)>0){
+            if(oldValue.toString().contains(account)){
                 return;
             }
-            propConfig.setProperty(ConfigurerConstant.ACCOUNTADDRESS, oldValue.toString()+"|"+account);
+            propConfig.setProperty(ConfigurerConstant.ACCOUNTADDRESS, oldValue.toString()+ConfigurerConstant.SEPARATOR+account);
         }else {
             propConfig.setProperty(ConfigurerConstant.ACCOUNTADDRESS, account);
         }
@@ -90,15 +90,15 @@ public class ContractInfoConfigurer implements InitializingBean {
     public boolean deleteKey(String key,String value){
         Object oldValue =propConfig.getProperty(key);
         if(!oldValue.equals("")){
-            if(oldValue.toString().indexOf(value)>0){
-                String[] values= oldValue.toString().split("|");
-                String nodeStr="";
+            if(oldValue.toString().contains(value)){
+                String[] values= oldValue.toString().split("\\|");
+                StringBuffer nodeStr=new StringBuffer();
                 for(int i=0;i<values.length;i++){
                     if(!values[i].equals(value)){
-                        nodeStr=nodeStr+values[i]+"|";
+                        nodeStr.append(values[i]).append("|");
                     }
                 }
-                propConfig.setProperty(key, nodeStr.substring(0,nodeStr.length()-1));
+                propConfig.setProperty(key, nodeStr.deleteCharAt(nodeStr.length()-1).toString());
                 return true;
             }else{
                 return true;

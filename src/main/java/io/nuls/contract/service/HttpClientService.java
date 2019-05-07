@@ -25,6 +25,7 @@ public class HttpClientService {
 
     public RpcClientResult getRequest(String urlPath) throws Exception {
         String url =getServicePath(urlPath);
+        logger.info("getRequest URL: "+url);
         HttpConfig config = HttpConfig.initHttpConfig();
         //简单调用
         String resp = HttpClientUtil.get(config.url(url));
@@ -34,7 +35,7 @@ public class HttpClientService {
 
     public RpcClientResult postRequest(String urlPath ,Object  call) throws Exception{
         String url =getServicePath(urlPath);
-        logger.info(url);
+        logger.info("postRequest URL: "+url +" , paramter: "+ call.toString());
         HttpConfig config = HttpConfig.initHttpConfig();
         String jsonStr =JSONUtils.obj2json(call);
         Map<String, Object> map = new HashMap<String, Object>();
