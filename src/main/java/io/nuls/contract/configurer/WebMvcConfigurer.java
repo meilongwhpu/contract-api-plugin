@@ -11,6 +11,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -19,8 +20,10 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -39,6 +42,9 @@ import java.util.List;
 public class WebMvcConfigurer extends WebMvcConfigurerAdapter {
 
     private final Logger logger = LoggerFactory.getLogger(WebMvcConfigurer.class);
+
+    @Autowired
+    private ContractInfoConfigurer infoConfigurer;
 
     //使用阿里 FastJson 作为JSON MessageConverter
     @Override
@@ -98,6 +104,27 @@ public class WebMvcConfigurer extends WebMvcConfigurerAdapter {
         //registry.addMapping("/**");
     }
 
+    //添加拦截器
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new HandlerInterceptorAdapter() {
+            @Override
+            public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+                if(!request.getRequestURI().contains("localService")&& !request.getRequestURI().contains("swagger-resources")){
+                    if(infoConfigurer.getIpAndPort().length==0){
+                        logger.warn("调用远程服务接口:{}，未配置服务端节点信息",request.getRequestURI());
+                        Result result = new Result();
+                        result.setCode(ResultCode.FAIL).setMessage("请先配置服务端节点信息");
+                        responseResult(response, result);
+                        return false;
+                    }
+                }
+                return  true;
+            }
+        });
+
+
+    }
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("swagger-ui.html")

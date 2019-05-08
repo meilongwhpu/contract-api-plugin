@@ -286,7 +286,7 @@ public class ContractServiceImpl implements ContractService {
             downloadThread.setTargetPath(targetPath);
             Thread thread =new Thread(downloadThread);
             thread.start();
-            result=ResultGenerator.genSuccessResult("正在下载，请在路径:"+targetPath+"下面查看jar包");
+            result=ResultGenerator.genSuccessResult("正在下载，请在路径:"+targetPath+"下面查看"+address+".jar包");
         }catch (Exception e){
             logger.error(e.getMessage(),e);
             result=ResultGenerator.genFailResult(e.getMessage());

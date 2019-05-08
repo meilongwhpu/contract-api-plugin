@@ -50,7 +50,7 @@ public class ContractInfoConfigurer implements InitializingBean {
         if(ipAndPort!=null &&!ipAndPort.toString().equals("")){
             return   ipAndPort.toString().split("\\|");
         }else{
-            return new String[1];
+            return new String[0];
         }
     }
 
@@ -71,7 +71,7 @@ public class ContractInfoConfigurer implements InitializingBean {
         if(account!=null &&!account.toString().equals("")){
             return   account.toString().split("\\|");
         }else{
-            return new String[1];
+            return new String[0];
         }
     }
 

@@ -46,10 +46,14 @@ public class HttpClientDownloadThread implements Runnable {
     public void run() {
         logger.info("start HttpClientDownloadThread");
         try{
-            httpClientService.downloadRequest(ContractService.CONTEXT_PATH+ContractService.EXPORT+contractAddress,targetPath);
+            boolean result =httpClientService.downloadRequest(ContractService.CONTEXT_PATH+ContractService.EXPORT+contractAddress,targetPath);
+            if(result){
+                logger.info("end HttpClientDownloadThread,download finish");
+            }else{
+                logger.info("end HttpClientDownloadThread,download fail");
+            }
         }catch (Exception e){
             logger.error(e.getMessage(),e);
         }
-        logger.info("end HttpClientDownloadThread");
     }
 }

@@ -13,10 +13,10 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.*;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +29,7 @@ import java.util.Map;
  * @version 1.0
  */
 public class HttpClientUtil{
-	
+	private final static Logger logger = LoggerFactory.getLogger(HttpClientUtil.class);
 	//默认采用的http协议的HttpClient对象
 	private static  HttpClient client4HTTP;
 	
@@ -294,6 +294,13 @@ public class HttpClientUtil{
 		}
 		return fmt2Stream(execute(config), config.out());
 	}
+
+	public static boolean down(HttpConfig config,String targetPath) throws HttpProcessException {
+		if(config.method() == null) {
+			config.method(HttpMethods.GET);
+		}
+		return fmt2Stream(execute(config), targetPath);
+	}
 	
 	/**
 	 * 上传文件
@@ -519,7 +526,36 @@ public class HttpClientUtil{
 		}
 		return out;
 	}
-	
+
+	public static boolean fmt2Stream(HttpResponse resp, String targetPath) throws HttpProcessException {
+		try {
+			String filename=System.currentTimeMillis()+".jar";
+			Header[] header =resp.getHeaders("Content-Disposition");
+			if(header.length>0){
+				String content= header[0].getValue();
+				filename =content.substring(content.lastIndexOf("filename=")+9);
+			}
+			targetPath= targetPath+ File.separator+filename;
+			logger.info("下载jar包的路径在"+targetPath);
+
+			File file = new File(targetPath);
+			if(file.exists()){
+				file.delete();
+			}
+			resp.getEntity().writeTo(new FileOutputStream(file));
+			EntityUtils.consume(resp.getEntity());
+			if(file.exists()){
+				return  true;
+			}else{
+				return false;
+			}
+		} catch (IOException e) {
+			throw new HttpProcessException(e);
+		}finally{
+			close(resp);
+		}
+	}
+
 	/**
 	 * 根据请求方法名，获取request对象
 	 * 

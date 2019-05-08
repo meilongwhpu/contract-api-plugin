@@ -27,7 +27,7 @@ public class ContractController {
     @Resource
     private PackageService packageService;
 
-    @PostMapping("/package")
+    @PostMapping("/localService/package")
     @ApiOperation(value="智能合约打包",notes="智能合约打包")
     public Result packageContract(@ApiParam(name="packageContractInfo", value="智能合约的源代码信息", required=true) @RequestBody PackageContractInfo packageContractInfo){
         if(packageContractInfo==null){
@@ -45,7 +45,7 @@ public class ContractController {
         return  packageService.packageForJar(packageContractInfo.getMvnProjectRootPath(), packageContractInfo.getTargetPath(),packageContractInfo.getJarName());
     }
 
-    @GetMapping("/genHexEncode")
+    @GetMapping("/localService/genHexEncode")
     @ApiOperation(value="生成HEX编码",notes="生成HEX编码")
     public Result generateHexEncode(@ApiParam(name="targetPath", value="jar包的本地地址", required=true) @RequestParam("targetPath") String targetPath){
         if(StringUtils.isBlank(targetPath)){
@@ -259,7 +259,7 @@ public class ContractController {
         return contractService.export(address,targetPath);
     }
 
-    @PostMapping("/addServiceNode")
+    @PostMapping("/localService/addServiceNode")
     @ApiOperation(value="添加服务器端的ip:port",notes="添加服务器端的ip:port")
     public Result addServiceNode(@ApiParam(name="NodeInfo", value="服务端节点信息", required=true) @RequestBody NodeInfo nodeInfo){
        if(StringUtils.isBlank(nodeInfo.getIpAndPort())){
@@ -271,13 +271,13 @@ public class ContractController {
         return contractService.addServiceNode(nodeInfo);
     }
 
-    @GetMapping(value="/getServiceNode")
+    @GetMapping(value="/localService/getServiceNode")
     @ApiOperation(value="获取服务端节点信息",notes="获取服务端节点信息")
     public Result getServiceNode(){
         return contractService.getServiceNode();
     }
 
-    @PostMapping("/removeServiceNode")
+    @PostMapping("/localService/removeServiceNode")
     @ApiOperation(value="删除服务器端的ip:port",notes="删除服务器端的ip:port")
     public Result removeServiceNode(@ApiParam(name="NodeInfo", value="服务端节点信息", required=true) NodeInfo nodeInfo){
         if(StringUtils.isBlank(nodeInfo.getIpAndPort())){
@@ -289,7 +289,7 @@ public class ContractController {
         return contractService.removeServiceNode(nodeInfo);
     }
 
-    @PostMapping("/addAccount/{address}")
+    @PostMapping("/localService/addAccount/{address}")
     @ApiOperation(value="添加账户地址",notes="添加账户地址")
     public Result addAccountAddress(@ApiParam(name="address", value="账户地址", required=true) @RequestParam("address") String address){
         if(StringUtils.isBlank(address)){
@@ -298,14 +298,14 @@ public class ContractController {
         return  contractService.addAccountAddress(address);
     }
 
-    @GetMapping(value="/getAccountAddress")
+    @GetMapping(value="/localService/getAccountAddress")
     @ApiOperation(value="获取账户地址信息",notes="获取账户地址信息")
     public Result getAccountAddress(){
         return contractService.getAccountAddress();
     }
 
 
-    @PostMapping("/delAccount/{address}")
+    @PostMapping("/localService/delAccount/{address}")
     @ApiOperation(value="删除账户地址",notes="删除账户地址")
     public Result delAccountAddress(@ApiParam(name="address", value="账户地址", required=true) @RequestParam("address") String address){
         if(StringUtils.isBlank(address)){

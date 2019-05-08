@@ -11,8 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -74,13 +72,7 @@ public class HttpClientService {
      */
     public boolean downloadRequest(String urlPath,String targetPath)throws Exception{
         String downUrl = getServicePath(urlPath);
-        File file = new File(targetPath);
-        HttpClientUtil.down(HttpConfig.initHttpConfig().url(downUrl).out(new FileOutputStream(file)));
-        if (file.exists()) {
-            return  true;
-        }else{
-            return false;
-        }
+        return HttpClientUtil.down(HttpConfig.initHttpConfig().url(downUrl),targetPath);
     }
 
     private String getServicePath(String urlPath){
